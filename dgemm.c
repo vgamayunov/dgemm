@@ -4,15 +4,20 @@
 #include <sys/time.h>
 
 #if defined(MKL)
-  #include "mkl.h"
-  #define ALLOCATE(size) mkl_malloc(size, 64)
-  #define FREE(p) mkl_free(p)
-#elif defined(BLIS)
-  #include "blis/cblas.h"
+    #include "mkl.h"
+    #define ALLOCATE(size) mkl_malloc(size, 64)
+    #define FREE(p) mkl_free(p)
+#endif
+
+#if defined(BLIS)
+    #include "blis/cblas.h"
+#endif
+
+#if ! defined(ALLOCATE)
   #define ALLOCATE(size) malloc(size)
+#endif
+#if ! defined(FREE)
   #define FREE(p) free(p)
-#else
-   #error Please use -DMKL or -DBLIS
 #endif
 
 #define min(x,y) (((x) < (y)) ? (x) : (y))
