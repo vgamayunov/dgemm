@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <omp.h>
 
 #if defined(MKL)
     #include "mkl.h"
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
     double time, flop, time1, mintime;
     int repeat;
     int c;
+    int nt;
 
     m = n = k = 12000;
     repeat = 10;
@@ -51,7 +53,8 @@ int main(int argc, char *argv[])
                 break;
         }
 
-    printf("DGEMM test. Size = %d, number of repetitions = %d\n", n, repeat);
+    nt = omp_get_max_threads();
+    printf("DGEMM test. Size = %d, number of repetitions = %d, number of threads = %d\n", n, repeat, nt);
 
 //    m = 2000, k = 200, n = 1000;
     alpha = 1.0; beta = 0.0;
@@ -88,7 +91,7 @@ int main(int argc, char *argv[])
         time1 = seconds();
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C, n);
         time1 = seconds() - time1;
-        printf("Time for repeat %2d was %.3lf sec, perf %.3lf GFlops\n", i, time1, flop/time1/1e9);
+        printf("Time for run %2d was %.3lf sec, perf %.3lf GFlops\n", i, time1, flop/time1/1e9);
         if (i == 0)
             mintime = time1;
         else
